@@ -1,5 +1,3 @@
-// CPP program for finding determinant matrix
-// with parallalizing the code
 #include <iostream>
 #include <vector>
 #include <pthread.h>
@@ -7,30 +5,24 @@
 
 using namespace std;
 
-// matrix whoe's determinant is required
 int mat[][size] = { { 0, 4, 0, -3  },
     { 1, 1, 5, 2  },
     { 1, -2, 0, 6  },
     { 3, 0, 0, 1  } };
 int det[size];
 
-// declaring variable for storing thread id
 pthread_t thread[size];
 
-// function for finding determinant
 int determinant(vector<vector<int> > mat2, int s)
 {
 
     if (s == 2) {
 
-        // if size of matrix is 2X2
-        // then returning the determinant
         return mat2[0][0] * mat2[1][1] -
             mat2[0][1] * mat2[1][0];
     }
     else {
 
-        // else dividing the matrix in smaller part.
         vector<vector<int> > mat1(s - 1),
             mat3(s - 1), mat4(s - 1);
         int k, l, m, i, j;
@@ -69,7 +61,7 @@ int determinant(vector<vector<int> > mat2, int s)
 
 // function for finding determinant using first row
 // with each element of row a thread is associated.
-void* createTd(void* arg)
+void* subdivide(void* arg)
 {
     int *ar = (int *)arg, i, j, k;
     vector<vector<int> > mat2(size - 1);
@@ -96,7 +88,7 @@ void* createTd(void* arg)
 // driver function
 int main()
 {
-    int i, j, detfin = 0;
+    int i, j, det_combine = 0;
     int p[size];
 
     // storing the first row in a array
@@ -108,7 +100,7 @@ int main()
     // creating thread
     for (i = 0; i < size; i++) {
         p[i] = i;
-        pthread_create(&thread[i], NULL, &createTd, (void*)&p[i]);
+        pthread_create(&thread[i], NULL, &subdivide, (void*)&p[i]);
     }
 
     // waiting for all the threads to join
@@ -118,12 +110,12 @@ int main()
     pthread_join(thread[3], NULL);
     for (i = 0; i < size; i++) {
         if (i % 2 == 0)
-            detfin += det[i];
+            det_combine += det[i];
         else
-            detfin -= det[i];
+            det_combine -= det[i];
     }
 
-    cout << detfin << endl;
+    cout << det_combine << endl;
 
     return 0;
 }
